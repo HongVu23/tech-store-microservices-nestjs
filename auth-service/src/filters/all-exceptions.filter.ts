@@ -1,0 +1,16 @@
+import { Catch, RpcExceptionFilter, HttpStatus } from '@nestjs/common';
+import { Observable, throwError } from 'rxjs';
+import { RpcException } from '@nestjs/microservices';
+
+@Catch()
+export class AllExceptionsFilter implements RpcExceptionFilter<any> {
+    catch(exception: any /*host: ArgumentsHost*/): Observable<any> {
+
+        if (exception instanceof RpcException) {
+            return throwError(() => exception.getError());
+        } else {
+            console.log(exception.stack)
+            return throwError(() => ({ statusCode: HttpStatus.INTERNAL_SERVER_ERROR, message: 'Internal Server Error' }));
+        }
+    }
+}
